@@ -1,0 +1,134 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    // users: { userID, userType, studentFullName, fatherName, isPremium, ... }
+    // accessCodes: { code, codeType, status, usedByUserID, ... }
+    // recoveryCodes: { recoveryCode, forUserID, status, ... }
+    // subjects, chapters, topics, questions: Educational content
+    // studentProgress, dailySessions, xpAndLevels, streaks, rewards: Tracking
+    // ===============================================================
+
+    // ===============================================================
+    // Helper Functions
+    // ===============================================================
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    function isAdmin() {
+      return isAuthenticated() && 
+        (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 'admin' ||
+         (request.auth.token.email == "muhammadlatif9292@gmail.com" && request.auth.token.email_verified == true));
+    }
+    function isTeacher() {
+      return isAuthenticated() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.userType == 'teacher';
+    }
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+    function uidNotModified() {
+      return !('userID' in request.resource.data) || request.resource.data.userID == resource.data.userID;
+    }
+
+    // ===============================================================
+    // Rules
+    // ===============================================================
+
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (isOwner(userId) || isAdmin() || isTeacher());
+      allow create: if isAuthenticated() && isOwner(userId) && 
+        (request.resource.data.userType == 'student' || 
+         (request.resource.data.userType == 'admin' && request.auth.token.email == "muhammadlatif9292@gmail.com"));
+      allow update: if isAuthenticated() && (isOwner(userId) && uidNotModified() || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /accessCodes/{codeId} {
+      allow read: if isAdmin();
+      allow create, update, delete: if isAdmin();
+      // Special rule for students to check code during login
+      allow get: if isAuthenticated(); 
+    }
+
+    match /recoveryCodes/{codeId} {
+      allow read: if isAdmin() || isTeacher();
+      allow create: if isAdmin() || isTeacher();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    match /subjects/{subjectId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /units/{unitId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /chapters/{chapterId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /topics/{topicId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /questions/{questionId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /studentProgress/{progressId} {
+      allow read: if isAuthenticated() && (isOwner(resource.data.userID) || isAdmin() || isTeacher());
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userID);
+      allow update: if isAuthenticated() && (isOwner(resource.data.userID) || isAdmin());
+    }
+
+    match /dailySessions/{sessionId} {
+      allow read: if isAuthenticated() && (isOwner(resource.data.userID) || isAdmin() || isTeacher());
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userID);
+      allow update: if isAuthenticated() && (isOwner(resource.data.userID) || isAdmin());
+    }
+
+    match /xpAndLevels/{xpId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userID);
+      allow update: if isAuthenticated() && (isOwner(resource.data.userID) || isAdmin());
+    }
+
+    match /streaks/{streakId} {
+      allow read: if isAuthenticated() && (isOwner(resource.data.userID) || isAdmin());
+      allow create: if isAuthenticated() && isOwner(request.resource.data.userID);
+      allow update: if isAuthenticated() && (isOwner(resource.data.userID) || isAdmin());
+    }
+
+    match /rewards/{rewardId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isAdmin();
+    }
+
+    match /dailyBites/{biteId} {
+      allow read: if isAuthenticated();
+      allow write: if isAdmin();
+    }
+
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && isOwner(resource.data.userID);
+      allow create: if isAdmin() || isTeacher();
+      allow update: if isAuthenticated() && isOwner(resource.data.userID) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['isRead']);
+    }
+
+    match /adminLogs/{logId} {
+      allow read, write: if isAdmin();
+    }
+  }
+}

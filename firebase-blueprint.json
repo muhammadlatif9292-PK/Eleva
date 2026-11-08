@@ -1,0 +1,340 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "App user profile (student, parent, teacher, admin)",
+      "type": "object",
+      "properties": {
+        "userID": { "type": "string" },
+        "personalID": { "type": "string" },
+        "originalCode": { "type": "string" },
+        "userType": { "type": "string", "enum": ["student", "parent", "teacher", "admin"] },
+        "displayName": { "type": "string" },
+        "studentFullName": { "type": "string" },
+        "fatherName": { "type": "string" },
+        "avatar": { "type": "string" },
+        "isPremium": { "type": "boolean" },
+        "nativeLanguage": { "type": "string", "enum": ["english", "urdu", "both"] },
+        "isFirstLogin": { "type": "boolean" },
+        "profileComplete": { "type": "boolean" },
+        "linkedParentPIN": { "type": "string" },
+        "linkedTeacherID": { "type": "string" },
+        "grade": { "type": "integer" },
+        "board": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "lastLogin": { "type": "string", "format": "date-time" },
+        "totalLoginDays": { "type": "integer" },
+        "isActive": { "type": "boolean" },
+        "isBlocked": { "type": "boolean" }
+      },
+      "required": ["userID", "userType", "isFirstLogin"]
+    },
+    "AccessCode": {
+      "title": "AccessCode",
+      "description": "Login codes for students",
+      "type": "object",
+      "properties": {
+        "codeID": { "type": "string" },
+        "code": { "type": "string" },
+        "codeType": { "type": "string", "enum": ["premium", "free"] },
+        "status": { "type": "string", "enum": ["unused", "used", "revoked"] },
+        "usedByUserID": { "type": "string" },
+        "usedAt": { "type": "string", "format": "date-time" },
+        "generatedByAdminID": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["code", "codeType", "status"]
+    },
+    "RecoveryCode": {
+      "title": "RecoveryCode",
+      "description": "Codes to recover lost Personal IDs",
+      "type": "object",
+      "properties": {
+        "recoveryCodeID": { "type": "string" },
+        "recoveryCode": { "type": "string" },
+        "forUserID": { "type": "string" },
+        "requestedByTeacherID": { "type": "string" },
+        "approvedByAdminID": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "approved", "used", "rejected"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "usedAt": { "type": "string", "format": "date-time" },
+        "expiresAfterUse": { "type": "boolean" }
+      }
+    },
+    "Subject": {
+      "title": "Subject",
+      "description": "Educational subjects",
+      "type": "object",
+      "properties": {
+        "subjectID": { "type": "string" },
+        "subjectName_EN": { "type": "string" },
+        "subjectName_UR": { "type": "string" },
+        "subjectIcon": { "type": "string" },
+        "subjectColor": { "type": "string" },
+        "languageGroup": { "type": "string", "enum": ["A", "B", "C"] },
+        "subjectType": { "type": "string" },
+        "totalChapters": { "type": "integer" },
+        "displayOrder": { "type": "integer" }
+      }
+    },
+    "Chapter": {
+      "title": "Chapter",
+      "description": "Subject chapters",
+      "type": "object",
+      "properties": {
+        "chapterID": { "type": "string" },
+        "subjectID": { "type": "string" },
+        "chapterNumber": { "type": "integer" },
+        "chapterTitle_EN": { "type": "string" },
+        "chapterTitle_UR": { "type": "string" },
+        "chapterDescription_EN": { "type": "string" },
+        "chapterDescription_UR": { "type": "string" },
+        "totalTopics": { "type": "integer" },
+        "estimatedMinutes": { "type": "integer" },
+        "monthTarget": { "type": "integer" },
+        "weekTarget": { "type": "integer" },
+        "difficultyLevel": { "type": "integer" },
+        "isUnlocked": { "type": "boolean" }
+      }
+    },
+    "Topic": {
+      "title": "Topic",
+      "description": "Chapter topics",
+      "type": "object",
+      "properties": {
+        "topicID": { "type": "string" },
+        "chapterID": { "type": "string" },
+        "subjectID": { "type": "string" },
+        "topicTitle_EN": { "type": "string" },
+        "topicTitle_UR": { "type": "string" },
+        "topicContent_EN": { "type": "string" },
+        "topicContent_UR": { "type": "string" },
+        "topicType": { "type": "string" },
+        "difficultyLevel": { "type": "integer" },
+        "keyPoints_EN": { "type": "array", "items": { "type": "string" } },
+        "keyPoints_UR": { "type": "array", "items": { "type": "string" } },
+        "hasFormula": { "type": "boolean" },
+        "hasDiagram": { "type": "boolean" },
+        "hasArabicText": { "type": "boolean" },
+        "arabicText": { "type": "string" },
+        "estimatedReadMinutes": { "type": "integer" },
+        "displayOrder": { "type": "integer" }
+      }
+    },
+    "Question": {
+      "title": "Question",
+      "description": "Assessment questions",
+      "type": "object",
+      "properties": {
+        "questionID": { "type": "string" },
+        "subjectID": { "type": "string" },
+        "chapterID": { "type": "string" },
+        "topicID": { "type": "string" },
+        "questionText_EN": { "type": "string" },
+        "questionText_UR": { "type": "string" },
+        "questionType": { "type": "string" },
+        "options_EN": { "type": "array", "items": { "type": "string" } },
+        "options_UR": { "type": "array", "items": { "type": "string" } },
+        "correctAnswer": { "type": "string" },
+        "explanation_EN": { "type": "string" },
+        "explanation_UR": { "type": "string" },
+        "difficultyLevel": { "type": "integer" },
+        "marks": { "type": "integer" },
+        "isPastPaper": { "type": "boolean" },
+        "boardYear": { "type": "integer" }
+      }
+    },
+    "StudentProgress": {
+      "title": "StudentProgress",
+      "description": "Tracking student mastery",
+      "type": "object",
+      "properties": {
+        "progressID": { "type": "string" },
+        "userID": { "type": "string" },
+        "subjectID": { "type": "string" },
+        "chapterID": { "type": "string" },
+        "topicID": { "type": "string" },
+        "status": { "type": "string", "enum": ["not-started", "in-progress", "completed"] },
+        "masteryLevel": { "type": "integer" },
+        "score": { "type": "number" },
+        "bestScore": { "type": "number" },
+        "timeSpent": { "type": "integer" },
+        "attemptCount": { "type": "integer" },
+        "lastAccessed": { "type": "string", "format": "date-time" },
+        "reviewDue": { "type": "string", "format": "date" }
+      }
+    },
+    "DailySession": {
+      "title": "DailySession",
+      "description": "Daily learning activity",
+      "type": "object",
+      "properties": {
+        "sessionID": { "type": "string" },
+        "userID": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "subjectID": { "type": "string" },
+        "sessionType": { "type": "string" },
+        "startTime": { "type": "string", "format": "date-time" },
+        "endTime": { "type": "string", "format": "date-time" },
+        "duration": { "type": "integer" },
+        "targetDuration": { "type": "integer" },
+        "completedOnTime": { "type": "boolean" },
+        "xpEarned": { "type": "integer" },
+        "score": { "type": "number" },
+        "questionsAttempted": { "type": "integer" },
+        "questionsCorrect": { "type": "integer" }
+      }
+    },
+    "Test": {
+      "title": "Test",
+      "description": "Periodic assessments",
+      "type": "object",
+      "properties": {
+        "testID": { "type": "string" },
+        "testName_EN": { "type": "string" },
+        "testName_UR": { "type": "string" },
+        "testType": { "type": "string" },
+        "subjectID": { "type": "string" },
+        "chapterIDs": { "type": "array", "items": { "type": "string" } },
+        "questionIDs": { "type": "array", "items": { "type": "string" } },
+        "totalMarks": { "type": "integer" },
+        "passingMarks": { "type": "integer" },
+        "duration": { "type": "integer" },
+        "scheduledDate": { "type": "string", "format": "date" },
+        "isPremiumOnly": { "type": "boolean" }
+      }
+    },
+    "TestResult": {
+      "title": "TestResult",
+      "description": "Results of tests",
+      "type": "object",
+      "properties": {
+        "resultID": { "type": "string" },
+        "testID": { "type": "string" },
+        "userID": { "type": "string" },
+        "answers": { "type": "array" },
+        "score": { "type": "number" },
+        "totalMarks": { "type": "integer" },
+        "percentage": { "type": "number" },
+        "grade": { "type": "string" },
+        "timeTaken": { "type": "integer" },
+        "submittedAt": { "type": "string", "format": "date-time" },
+        "xpEarned": { "type": "integer" }
+      }
+    },
+    "XPAndLevel": {
+      "title": "XPAndLevel",
+      "description": "Gamification data",
+      "type": "object",
+      "properties": {
+        "xpID": { "type": "string" },
+        "userID": { "type": "string" },
+        "totalXP": { "type": "integer" },
+        "currentLevel": { "type": "integer" },
+        "levelTitle": { "type": "string" },
+        "weeklyXP": { "type": "integer" },
+        "monthlyXP": { "type": "integer" },
+        "subjectXP": { "type": "object" },
+        "rankGlobal": { "type": "integer" },
+        "rankNational": { "type": "integer" }
+      }
+    },
+    "Streak": {
+      "title": "Streak",
+      "description": "User login streaks",
+      "type": "object",
+      "properties": {
+        "streakID": { "type": "string" },
+        "userID": { "type": "string" },
+        "currentStreak": { "type": "integer" },
+        "longestStreak": { "type": "integer" },
+        "lastActiveDate": { "type": "string", "format": "date" },
+        "freezesAvailable": { "type": "integer" },
+        "freezesUsed": { "type": "integer" },
+        "weeklyGoalDays": { "type": "integer" }
+      }
+    },
+    "Reward": {
+      "title": "Reward",
+      "description": "Badges and trophies",
+      "type": "object",
+      "properties": {
+        "rewardID": { "type": "string" },
+        "userID": { "type": "string" },
+        "rewardType": { "type": "string" },
+        "rewardName_EN": { "type": "string" },
+        "rewardName_UR": { "type": "string" },
+        "rewardDescription_EN": { "type": "string" },
+        "rewardDescription_UR": { "type": "string" },
+        "rewardImage": { "type": "string" },
+        "rarity": { "type": "string" },
+        "earnedAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "DailyBite": {
+      "title": "DailyBite",
+      "description": "Micro-learning content",
+      "type": "object",
+      "properties": {
+        "biteID": { "type": "string" },
+        "date": { "type": "string", "format": "date" },
+        "subjectID": { "type": "string" },
+        "biteType": { "type": "string" },
+        "biteTitle_EN": { "type": "string" },
+        "biteTitle_UR": { "type": "string" },
+        "biteContent_EN": { "type": "string" },
+        "biteContent_UR": { "type": "string" },
+        "chapterID": { "type": "string" }
+      }
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "In-app notifications",
+      "type": "object",
+      "properties": {
+        "notificationID": { "type": "string" },
+        "userID": { "type": "string" },
+        "title_EN": { "type": "string" },
+        "title_UR": { "type": "string" },
+        "message_EN": { "type": "string" },
+        "message_UR": { "type": "string" },
+        "type": { "type": "string" },
+        "isRead": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    },
+    "AdminLog": {
+      "title": "AdminLog",
+      "description": "Audit logs for admin actions",
+      "type": "object",
+      "properties": {
+        "logID": { "type": "string" },
+        "adminID": { "type": "string" },
+        "action": { "type": "string" },
+        "targetType": { "type": "string" },
+        "targetID": { "type": "string" },
+        "details": { "type": "object" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      }
+    }
+  },
+  "firestore": {
+    "users": { "schema": "User", "description": "User profiles" },
+    "accessCodes": { "schema": "AccessCode", "description": "Login codes" },
+    "recoveryCodes": { "schema": "RecoveryCode", "description": "Recovery codes" },
+    "subjects": { "schema": "Subject", "description": "Subjects list" },
+    "chapters": { "schema": "Chapter", "description": "Chapters per subject" },
+    "topics": { "schema": "Topic", "description": "Topics per chapter" },
+    "questions": { "schema": "Question", "description": "Question bank" },
+    "studentProgress": { "schema": "StudentProgress", "description": "Student progress tracking" },
+    "dailySessions": { "schema": "DailySession", "description": "Daily activity logs" },
+    "tests": { "schema": "Test", "description": "Available tests" },
+    "testResults": { "schema": "TestResult", "description": "Test results" },
+    "xpAndLevels": { "schema": "XPAndLevel", "description": "XP and level data" },
+    "streaks": { "schema": "Streak", "description": "Streak tracking" },
+    "rewards": { "schema": "Reward", "description": "Earned rewards" },
+    "dailyBites": { "schema": "DailyBite", "description": "Daily micro-learning" },
+    "notifications": { "schema": "Notification", "description": "User notifications" },
+    "adminLogs": { "schema": "AdminLog", "description": "Admin audit logs" }
+  }
+}
